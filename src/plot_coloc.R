@@ -1,35 +1,30 @@
-#/opt/software/R/3.1.1/bin/R
+#/opt/software/R/3.1.2/bin/R
 
 # plot_coloc.R
 # Caleb Matthew Radens
 # 2016_1_5
+# modified by YoSon
 
 # plot_coloc contains functions for running coloc.abf() and visualizing
 #   the input and output data and results.
 
 # Given genes, traits, directories, run coloc.abf() and output plots
 
-# I tested this script using the PMACS R module 3.1.1
+# I tested this script using the PMACS R module 3.1.2
 system("echo ===========================",wait=FALSE)
 system("echo inside plot_coloc.R",wait=FALSE)
 R_ver <- substr(version$version.string,1,15) # Get R version
 system(paste("echo",R_ver),wait=FALSE)
 system("echo ===========================",wait=FALSE)
 
-if (substr(R_ver,11,15) != "3.1.1"){
+if (substr(R_ver,11,15) != "3.1.2"){
   stop("Please load R module 3.1.1 before initiating this script")
 }
 
-# Choose a path to load R packages from:
-lp <- "/project/chrbrolab/analysis/cradens/bin/r_libs/r_module_3_1_1"
-
-# Add your library path to the current session of R's library path variable
-.libPaths(lp)
-
 source('coloc_analysis.R')
-require('hash',lib=lp)
-require('scales',lib=lp)
-require('data.table',lib=lp) 
+require('hash')
+require('scales')
+require('data.table') 
 
 system("echo wrapper package and script dependencies loaded and checked",wait=FALSE)
 
