@@ -4,30 +4,25 @@
 # Caleb Matthew Radens
 # cradens@mail.med.upenn.edu
 # Last Update: 2016_1_26
+# modified by YoSon
 
 # This is a wrapper script that runs imports a GWAS trait table and all eQTL tables that
 #   fall within 1e6 bp of sentinal SNP regions in the GWAS table, then exports tables
 #   that are a merge of the GWAS and each eQTL table.
 
-# I tested this script using the PMACS R module 3.1.1
+# I tested this script using the PMACS R module 3.1.2
 system("echo ===========================",wait=FALSE)
 system("echo inside make_gene_trait_tables.R",wait=FALSE)
 R_ver <- substr(version$version.string,1,15) # Get R version
 system(paste("echo",R_ver),wait=FALSE)
 system("echo ===========================",wait=FALSE)
 
-if (substr(R_ver,11,15) != "3.1.1"){
-  stop("Please run 'module load R-3.1.1' before initiating this script")
+if (substr(R_ver,11,15) != "3.1.2"){
+  stop("Please run 'module load R-3.1.2' before initiating this script")
 }
 
-# Choose a path to load R packages from:
-lp <- "/project/chrbrolab/analysis/cradens/bin/r_libs/r_module_3_1_1"
-
-# Add your library path to the current session of R's library path variable
-.libPaths(lp)
-
 # Loads the required packages
-require(data.table,lib=lp) # eQTL_directory <- "/project/chrbrolab/coloc/data/ivs"
+require(data.table)
 
 base <- "/project/chrbrolab/analysis/cradens/coloc_for_yoson/script/"
 setwd(base)
@@ -38,6 +33,7 @@ system("echo wrapper package and script dependencies loaded",wait=FALSE)
 # Extract cmd arguments (see get_command_args in import.R for details)
 # Too Long, Didn't Read: you can add trailing arguments to this function if
 #  called in PMACS.. those arguments are captured by get_command_args
+
 args <- commandArgs(trailingOnly = TRUE)
 # See function description in import.R 
 args <- get_command_args(args) 
@@ -47,9 +43,6 @@ print(args)
 GWAS_file <- args[["file"]]
 Trait <- args[["trait"]]
 eQTL_directory <- args[["eQTL_dir"]]
-
-# Specify where the eQTL files are located
-# eQTL_directory <- "/project/chrbrolab/coloc/data/ivs/"
 
 # Retrieve list of genes matching the pattern below and assign filepath to each gene
 genes <- get_gene_names(directory= eQTL_directory, Pattern=".txt")
@@ -115,7 +108,7 @@ for (Gene in unique_genes){
     # Get the loci from trait_table_PV that match the chromosome of the gene
     t_pos <- trait_table_PVs$chr_pos[which(grepl(g_chr,trait_table_PVs$chr))]
     t_pos <- as.integer(matrix(unlist(strsplit(t_pos,split=":")),ncol=2,byrow=TRUE)[,2])
-    # If the g_tss is within 1MB of the genome-wide significant PV:
+    # If the g_tss is within 100kb of the genome-wide significant PV:
     if (TRUE%in%(t_pos >= bottom & t_pos <= top)){
       # Add the gene to the sig_gene list if any of the trait PVs are close to the gene
       sig_genes <- c(sig_genes,Gene)

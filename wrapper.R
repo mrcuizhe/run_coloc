@@ -4,6 +4,7 @@
 # Caleb Matthew Radens
 # cradens@mail.med.upenn.edu
 # Last Update: 2016_1_28
+# Modified by YoSon
 
 # This is a wrapper script that runs coloc.abf() on eQTL<->GWAS, genome wide
 #  The output is
@@ -15,31 +16,38 @@
 # All three scripts (those mentioned ^^^ and make_gene_trait_tables.R) should be located in
 #   the same directory.
 
-# I tested this script using the PMACS R module 3.1.1
+# example usage:
+# Rscript wrapper.R
+
+# I tested this script using the PMACS R module 3.1.2
 system("echo ===========================",wait=FALSE)
 R_ver <- substr(version$version.string,1,15) # Get R version
 system(paste("echo",R_ver),wait=FALSE)
 system("echo ===========================",wait=FALSE)
 
-if (substr(R_ver,11,15) != "3.1.1"){
-  stop("Please load R module 3.1.1 before initiating this script")
+if (substr(R_ver,11,15) != "3.1.2"){
+  stop("Please load R module 3.1.2 before initiating this script")
 }
 
 # Start a stopwatch!
 start_time <- proc.time()[3]
 
-# Choose a path to load R packages from:
-lp <- "/project/chrbrolab/analysis/cradens/bin/r_libs/r_module_3_1_1"
-
-# Add your library path to the current session of R's library path variable
-.libPaths(lp)
-
 # Loads the required packages
-require(data.table,lib=lp) 
-require(hash,lib=lp) 
-require(coloc,lib=lp) 
+require(data.table) 
+require(hash) 
+require(coloc) 
 
-base <- "/project/chrbrolab/analysis/cradens/coloc_for_yoson/script/"
+args <- commandArgs(TRUE)
+
+if (length(args)==0) {
+  stop("input files are not specified", call.=FALSE)
+} else if (length(args)==1) {
+  # setup some test directories in case argument missing
+  args[2] = "/project/chrbrolab/analysis/cradens/coloc_for_yoson/data/eQTLs/Liver/"
+  args[3] = "/project/chrbrolab/analysis/cradens/coloc_for_yoson/data/GWASs/"
+}
+
+base <- args[1]
 setwd(base)
 
 # Get functions from import.R
@@ -47,14 +55,13 @@ source("import.R")
 
 system("echo wrapper package and script dependencies loaded and checked",wait=FALSE)
 
-# Directory in chrbrolab:
-# GWAS_directory <- "/project/chrbrolab/coloc/data/endpoint/"
-GWAS_directory <- "/project/chrbrolab/analysis/cradens/coloc_for_yoson/data/GWASs/"
+
+GWAS_directory <- argv[3]
 
 # Retreive list of traits from GWAS_directory and assign full filepaths to them
 traits <- get_GWAS_traits(directory = GWAS_directory, Pattern = "GLGC")
 
-eQTL_directory <- "/project/chrbrolab/analysis/cradens/coloc_for_yoson/data/eQTLs/Liver/"
+eQTL_directory <- argv[2]
 
 
 # For each trait, launch make_gene_trait_tables.R script
